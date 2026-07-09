@@ -1,0 +1,48 @@
+name: Build and cache packages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cachix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - bilibili-video-downloader
+          - sing-box-beta
+          - tonghuashun
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31.10.6
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Cachix
+        uses: cachix/cachix-action@v17
+        with:
+          name: rxda-cache
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build package
+        run: nix build .#${{ matrix.package }} --print-build-logs
+
