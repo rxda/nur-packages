@@ -43,6 +43,48 @@ jobs:
           name: rxda-cache
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Build package
-        run: nix build .#${{ matrix.package }} --print-build-logs
+      - name: Compute package hash
+        id: package-hash
+        run: |
+          drv_path="$(nix eval --raw .#${{ matrix.package }}.drvPath)"
+          drv_name="$(basename "$drv_path")"
+          drv_hash="${drv_name%%-*}"
 
+          echo "drv_path=$drv_path" >> "$GITHUB_OUTPUT"
+          echo "drv_hash=$drv_hash" >> "$GITHUB_OUTPUT"
+          echo "Package ${{ matrix.package }} derivation: $drv_path"
+
+      - name: Restore build marker
+        id: build-marker
+        uses: actions/cache/restore@v4
+        with:
+          path: .build-markers/${{ matrix.package }}
+          key: nix-build-${{ runner.os }}-${{ matrix.package }}-${{ steps.package-hash.outputs.drv_hash }}
+
+      - name: Build package
+        if: steps.build-marker.outputs.cache-hit != 'true'
+        run: |
+          nix build .#${{ matrix.package }} \
+            --print-build-logs \
+            --out-link result-${{ matrix.package }}
+          cachix push rxda-cache result-${{ matrix.package }}
+
+      - name: Record build marker
+        if: steps.build-marker.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p .build-markers/${{ matrix.package }}
+          echo "${{ steps.package-hash.outputs.drv_path }}" > .build-markers/${{ matrix.package }}/drv-path
+          echo "${{ steps.package-hash.outputs.drv_hash }}" > .build-markers/${{ matrix.package }}/drv-hash
+          echo "${{ github.sha }}" > .build-markers/${{ matrix.package }}/commit
+
+      - name: Save build marker
+        if: steps.build-marker.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .build-markers/${{ matrix.package }}
+          key: nix-build-${{ runner.os }}-${{ matrix.package }}-${{ steps.package-hash.outputs.drv_hash }}
+
+      - name: Skip unchanged package
+        if: steps.build-marker.outputs.cache-hit == 'true'
+        run: |
+          echo "Skipping ${{ matrix.package }}: derivation hash ${{ steps.package-hash.outputs.drv_hash }} was already built."
