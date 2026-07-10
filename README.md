@@ -24,9 +24,10 @@ nix build .#sing-box-beta
 - `bilibili-video-downloader`
 - `hello-nur`
 - `sing-box-beta`
+- `tongdaxin`
 - `tonghuashun`
 
-`tonghuashun` is unfree and depends on OpenSSL 1.1, so consumers may need to set:
+`tongdaxin` and `tonghuashun` are unfree. `tonghuashun` also depends on OpenSSL 1.1, so consumers may need to set:
 
 ```nix
 {
