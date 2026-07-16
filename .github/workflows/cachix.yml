@@ -26,7 +26,6 @@ jobs:
         package:
           - bilibili-video-downloader
           - sing-box-beta
-          - tongdaxin
           - tonghuashun
 
     steps:

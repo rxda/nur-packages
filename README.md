@@ -26,7 +26,7 @@ nix build .#sing-box-beta
 - `sing-box-beta`
 - `tonghuashun`
 
-`tongdaxin` and `tonghuashun` are unfree. `tonghuashun` also depends on OpenSSL 1.1, so consumers may need to set:
+`tonghuashun` are unfree. `tonghuashun` also depends on OpenSSL 1.1, so consumers may need to set:
 
 ```nix
 {
