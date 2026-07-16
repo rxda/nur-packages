@@ -5,7 +5,7 @@
   fetchFromGitHub,
   pkg-config,
   nodejs,
-  pnpm_10,
+  pnpm_11,
   fetchPnpmDeps,
   pnpmConfigHook,
   wrapGAppsHook4,
@@ -14,6 +14,8 @@
   ffmpeg,
   cargo-tauri,
   glib-networking,
+  makeDesktopItem,
+  copyDesktopItems,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -31,18 +33,19 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    pnpm = pnpm_10;
-    fetcherVersion = 3;
-    hash = "sha256-O2ZBk//OgkaG+HBAwuXQRkZbzYcr5705cOKwUooSDFg=";
+    pnpm = pnpm_11;
+    fetcherVersion = 4;
+    hash = "sha256-kwORI+j+GSBvuyLdlBmVFYMwyIoYgv2QYhKpBwn+RSE=";
   };
 
   nativeBuildInputs = [
     pkg-config
     nodejs
-    pnpm_10
+    pnpm_11
     pnpmConfigHook
     cargo-tauri.hook
     wrapGAppsHook4
+    copyDesktopItems
   ];
 
   buildInputs = [
@@ -66,19 +69,16 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-ICZtSWDWho3UVTMVb4CfAbOSopKXyQEJ/A15BGBLdr0=";
 
-  postInstall = ''
-    install -Dm644 src-tauri/icons/128x128.png $out/share/icons/hicolor/128x128/apps/bilibili-video-downloader.png
-    mkdir -p $out/share/applications
-    cat > $out/share/applications/bilibili-video-downloader.desktop <<EOF
-    [Desktop Entry]
-    Name=Bilibili Video Downloader
-    Exec=bilibili-video-downloader
-    Icon=bilibili-video-downloader
-    Type=Application
-    Terminal=false
-    Categories=Video;
-    EOF
-  '';
+  desktopItems = [
+    (makeDesktopItem {
+      name = "bilibili-video-downloader";
+      exec = "bilibili-video-downloader";
+      icon = "bilibili-video-downloader";
+      desktopName = "Bilibili Video Downloader";
+      comment = finalAttrs.meta.description;
+      categories = [ "Video" ];
+    })
+  ];
 
   meta = {
     description = "Gui tool for downloading Bilibili videos";

@@ -32,7 +32,6 @@
           bilibili-video-downloader = nurPkgs.bilibili-video-downloader;
           hello-nur = nurPkgs.hello-nur;
           sing-box-beta = nurPkgs.sing-box-beta;
-          tongdaxin = nurPkgs.tongdaxin;
           tonghuashun = nurPkgs.tonghuashun;
         };
 
