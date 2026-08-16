@@ -30,6 +30,7 @@
         packages = {
           default = nurPkgs.hello-nur;
           bilibili-video-downloader = nurPkgs.bilibili-video-downloader;
+          deepseek-harness = nurPkgs.deepseek-harness;
           hello-nur = nurPkgs.hello-nur;
           sing-box-beta = nurPkgs.sing-box-beta;
           tonghuashun = nurPkgs.tonghuashun;

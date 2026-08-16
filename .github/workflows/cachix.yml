@@ -27,6 +27,7 @@ jobs:
           - bilibili-video-downloader
           - sing-box-beta
           - tonghuashun
+          - deepseek-harness
 
     steps:
       - name: Checkout
