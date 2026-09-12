@@ -22,6 +22,7 @@ nix build .#sing-box-beta
 ## Packages
 
 - `bilibili-video-downloader`
+- `chatgpt`
 - `hello-nur`
 - `sing-box-beta`
 - `tonghuashun`
