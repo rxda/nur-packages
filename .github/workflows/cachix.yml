@@ -24,10 +24,11 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - bilibili-video-downloader
+          # - bilibili-video-downloader
           - sing-box-beta
-          - tonghuashun
+          # - tonghuashun
           - deepseek-harness
+          - chatgpt
 
     steps:
       - name: Checkout

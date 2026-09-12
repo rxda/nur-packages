@@ -3,8 +3,10 @@
   stdenv,
   fetchurl,
   autoPatchelfHook,
+  dejavu_fonts,
   dpkg,
   git,
+  makeFontsConf,
   makeWrapper,
   xdg-utils,
   alsa-lib,
@@ -33,6 +35,7 @@
   libxrandr,
   mesa,
   pango,
+  perl,
   qt5,
   qt6Packages,
   systemdLibs,
@@ -52,6 +55,7 @@ stdenv.mkDerivation (finalAttrs: {
     autoPatchelfHook
     dpkg
     makeWrapper
+    perl
   ];
 
   buildInputs = [
@@ -90,6 +94,15 @@ stdenv.mkDerivation (finalAttrs: {
 
   autoPatchelfIgnoreMissingDeps = [ "libc.musl-x86_64.so.1" ];
 
+  fontconfigConf = makeFontsConf {
+    fontDirectories = [ dejavu_fonts ];
+  };
+
+  runtimeLibPath = lib.makeLibraryPath [
+    libglvnd
+    mesa
+  ];
+
   unpackPhase = ''
     runHook preUnpack
     dpkg -x "$src" .
@@ -109,7 +122,24 @@ stdenv.mkDerivation (finalAttrs: {
           git
           xdg-utils
         ]
-      }
+      } \
+      --set FONTCONFIG_FILE "${finalAttrs.fontconfigConf}" \
+      --prefix LD_LIBRARY_PATH : "${finalAttrs.runtimeLibPath}"
+
+    # The Linux git watcher triggers a crash in Electron's Node report API.
+    # The application falls back to getconf/ldd when this report is empty.
+    # Keep the replacement the same length so ASAR offsets remain valid.
+    perl -pi -e 's/report = process\.report\.getReport\(\);/sprintf("%-36s", "report = {};")/ge' \
+      "$out/lib/chatgpt/resources/app.asar"
+
+    # Electron calculates x/y for the primary window, but Wayland compositors
+    # may ignore explicit coordinates. Use Electron's native centering option
+    # for a new primary window, or a stale Wayland (0,0) restore; keep other
+    # restored bounds untouched. The available
+    # macOS-only hasNativeGlass field provides an equal-size replacement, so
+    # ASAR offsets remain valid without repacking the 300+ MiB archive.
+    perl -pi -e 's/hasNativeGlass:process\.platform===`darwin`&&o===`avatarOverlay`,/("center:y&&(b==null||b.x===0&&b.y===0)," . (" " x 26))/e' \
+      "$out/lib/chatgpt/resources/app.asar"
 
     runHook postInstall
   '';
