@@ -3,8 +3,12 @@
   stdenv,
   fetchurl,
   autoPatchelfHook,
+  bash,
+  bubblewrap,
+  coreutils,
   dejavu_fonts,
   dpkg,
+  gh,
   git,
   makeFontsConf,
   makeWrapper,
@@ -119,6 +123,10 @@ stdenv.mkDerivation (finalAttrs: {
     makeWrapper "$out/lib/chatgpt/codex-launcher" "$out/bin/chatgpt" \
       --prefix PATH : ${
         lib.makeBinPath [
+          bash
+          bubblewrap
+          coreutils
+          gh
           git
           xdg-utils
         ]
