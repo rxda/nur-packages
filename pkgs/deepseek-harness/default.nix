@@ -30,7 +30,7 @@ stdenv.mkDerivation (finalAttrs: {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
     fetcherVersion = 4;
-    hash = "sha256-FkexXPBmafoOqkrs9L4YPLGyP+A97CdYQMXvRZtWwWk=";
+    hash = "sha256-DNGGgnec3hFUs3LDorlUGzzgRT88i33y8TqyXfoXVnY=";
   };
 
   # fetchFromGitHub provides a source archive without Git metadata, while the
