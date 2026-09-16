@@ -17,21 +17,25 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "deepseek-harness";
-  version = "0.1.0-rc.5";
+  version = "0.1.6-alpha.1";
 
   src = fetchFromGitHub {
     owner = "deepseek-ai";
     repo = "deepseek-harness";
-    rev = "47f943859bef60e4160492346772ded9b24f765a";
-    hash = "sha256-ZPGCNoPXVjP76Tm/tFPDX2X95cd83M4iHLmVP5dR+Ps=";
+    rev = "0a15e36e7f82b6ed45af6fa9759f29b40dcd965d";
+    hash = "sha256-vlCnBbaUPtMBs+9do1QQ/71bWkgxOTXlP27CZeCRbCI=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
     fetcherVersion = 4;
-    hash = "sha256-aySHq0ywTMM5q7YuGHZrV3yQE3bwppgGfWH3wRnHCXk=";
+    hash = "sha256-FkexXPBmafoOqkrs9L4YPLGyP+A97CdYQMXvRZtWwWk=";
   };
+
+  # fetchFromGitHub provides a source archive without Git metadata, while the
+  # upstream client build embeds the source commit in generated artifacts.
+  DSH_CLIENT_COMMIT_HASH = "0a15e36e7f82b6ed45af6fa9759f29b40dcd965d";
 
   nativeBuildInputs = [
     nodejs_22

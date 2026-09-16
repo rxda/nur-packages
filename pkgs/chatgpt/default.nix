@@ -131,6 +131,7 @@ stdenv.mkDerivation (finalAttrs: {
           xdg-utils
         ]
       } \
+      --run "if [ -d \"\$HOME/.codex/.tmp/bundled-marketplaces\" ]; then chmod -R u+rwX \"\$HOME/.codex/.tmp/bundled-marketplaces\" 2>/dev/null || true; fi; if [ -d \"\$HOME/.codex/plugins/cache\" ]; then chmod -R u+rwX \"\$HOME/.codex/plugins/cache\" 2>/dev/null || true; fi; if [ -z \"\$CODEX_ELECTRON_BUNDLED_PLUGINS_RESOURCES_PATH\" ]; then cache_root=\"\$HOME/.cache\"; if [ -n \"\$XDG_CACHE_HOME\" ]; then cache_root=\"\$XDG_CACHE_HOME\"; fi; cache_dir=\"\$cache_root/chatgpt\"; source_dir=\"$out/lib/chatgpt/resources\"; stamp=\"\$cache_dir/.bundled-plugins-${finalAttrs.version}\"; if [ ! -f \"\$stamp\" ]; then mkdir -p \"\$cache_dir/plugins\"; rm -rf \"\$cache_dir/plugins/openai-bundled\"; cp -R \"\$source_dir/plugins/openai-bundled\" \"\$cache_dir/plugins/\"; chmod -R u+rwX \"\$cache_dir/plugins/openai-bundled\"; : > \"\$stamp\"; fi; export CODEX_ELECTRON_BUNDLED_PLUGINS_RESOURCES_PATH=\"\$cache_dir\"; fi" \
       --set FONTCONFIG_FILE "${finalAttrs.fontconfigConf}" \
       --prefix LD_LIBRARY_PATH : "${finalAttrs.runtimeLibPath}"
 
