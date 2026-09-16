@@ -66,7 +66,12 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p "$out/lib"
     cp -r . "$out/lib/deepseek-harness"
     patchShebangs "$out/lib/deepseek-harness/apps/cli/lib/bin.js"
-    makeWrapper "$out/lib/deepseek-harness/apps/cli/lib/bin.js" "$out/bin/dsh" \
+    # The upstream loader uses Node's internal ESM resolver to resolve plugins
+    # from the profile directory.  Without this flag, node-addon-require-builtin
+    # cannot expose that resolver on Nix's Node build and every bare plugin
+    # import is attempted relative to cordis-plugin-loader instead.
+    makeWrapper ${nodejs_22}/bin/node "$out/bin/dsh" \
+      --add-flags "--expose-internals $out/lib/deepseek-harness/apps/cli/lib/bin.js" \
       --prefix PATH : ${lib.makeBinPath [ nodejs_22 ]}
     runHook postInstall
   '';
